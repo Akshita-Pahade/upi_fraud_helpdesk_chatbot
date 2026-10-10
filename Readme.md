@@ -4,7 +4,7 @@ A RAG chatbot that answers UPI fraud, refund and complaint questions from offici
 
 Built with **n8n**, **Google Gemini**, **Pinecone**, **Google Drive** and **Google Sheets**. No code was written; the whole agent is two n8n workflows.
 
-**Demo video:** [add your YouTube (unlisted) link here]
+**Demo video:** 
 
 ![Chatbot workflow](screenshots/workflow-chatbot.png)
 
@@ -56,7 +56,6 @@ The AI Agent searches Pinecone first, then answers from what it finds. The syste
 | Document | Source |
 |---|---|
 | RBI circular RBI/2017-18/15, 6 July 2017: *Customer Protection – Limiting Liability of Customers in Unauthorised Electronic Banking Transactions* | [RBI website](https://www.rbi.org.in/commonman/english/scripts/Notification.aspx?Id=2336) |
-| NPCI *Dispute Redressal Mechanism* (UPI) | [add the npci.org.in page link you used] |
 
 The PDFs are not stored in this repo. Download them from the official pages above.
 
@@ -116,6 +115,3 @@ I tested the bot with questions whose answers I know from the documents, plus qu
 
 This is a student project. It is not affiliated with RBI, NPCI or any bank. Do not treat its answers as legal or financial advice.
 
----
-
-Built by Akshita Pahade as an AI mini project.
