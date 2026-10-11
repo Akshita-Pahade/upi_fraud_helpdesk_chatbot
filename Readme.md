@@ -1,8 +1,8 @@
 # UPI Fraud Helpdesk Chatbot (PayGuard Assistant)
 
-A RAG chatbot that answers UPI fraud, refund and complaint questions from official RBI and NPCI documents. It names the source in every answer and says so when something is not in its documents.
+A RAG chatbot that answers UPI fraud, refund and complaint questions from official RBI and NPCI documents. It names the source in its answers and says so when something is not in its documents.
 
-Built with **n8n**, **Google Gemini**, **Pinecone**, **Google Drive** and **Google Sheets**. No code was written; the whole agent is two n8n workflows.
+Built with **n8n**, **Google Gemini**, **Pinecone**, **Google Drive** and **Google Sheets**. It is a no-code project: the whole agent is two n8n workflows.
 
 **Demo video:** 
 
@@ -16,14 +16,20 @@ After a UPI fraud, people do not know three things: what they must do first, how
 
 ## What it does
 
-- Answers questions from the RBI and NPCI documents only.
-- Names the source in each answer, for example *(RBI circular, Para 9)*.
+- Answers questions from the RBI circular and the NPCI dispute redressal mechanism.
+- Names the source in its answers, for example *(RBI circular, Para 9)*.
 - Remembers the conversation, so follow-ups like "and if it takes 6 days?" work.
 - Says "This is not in my documents" when it does not know, instead of guessing.
 - Labels anything from outside the documents as *General guidance (not from my documents)*.
 - Never promises a refund and never asks for a PIN or OTP.
 - Refuses off-topic questions and harmful requests.
 - Logs every chat to a Google Sheet.
+
+### Example
+
+**Question:** Where do I first raise a UPI complaint, and what if it isn't fixed?
+
+**Answer (from the NPCI document):** Raise the complaint first on the UPI app you used. If it is not resolved, escalate in this order: the PSP bank, then your own bank, then NPCI. After that, you can approach the Banking Ombudsman and/or the Ombudsman for Digital Complaints.
 
 ## How it works
 
@@ -37,7 +43,7 @@ Google Drive Trigger -> Download file -> Pinecone Vector Store
                                           |- Default Data Loader
 ```
 
-When a PDF is added to a Google Drive folder, n8n downloads it, splits it into chunks, turns the chunks into embeddings with Gemini, and stores them in Pinecone.
+A PDF in a Google Drive folder is downloaded, split into chunks with n8n's default document loader, turned into embeddings with Gemini, and stored in Pinecone. Run this workflow once for each new document.
 
 **2. UPI Chatbot** (`workflows/2-upi-chatbot.json`)
 
@@ -49,15 +55,16 @@ When chat message received -> AI Agent -> Append row in Google Sheet -> Edit Fie
                                      |- Embeddings Google Gemini
 ```
 
-The AI Agent searches Pinecone first, then answers from what it finds. The system prompt is in `docs/system-prompt.txt`.
+The AI Agent searches Pinecone first, then answers from what it finds. The system prompt is in [docs/system-prompt.txt](docs/system-prompt.txt).
 
 ## Documents used
 
 | Document | Source |
 |---|---|
-| RBI circular RBI/2017-18/15, 6 July 2017: *Customer Protection – Limiting Liability of Customers in Unauthorised Electronic Banking Transactions* | [RBI website](https://www.rbi.org.in/commonman/english/scripts/Notification.aspx?Id=2336) |
+| RBI circular RBI/2017-18/15, 6 July 2017: *Customer Protection - Limiting Liability of Customers in Unauthorised Electronic Banking Transactions* | [RBI website](https://www.rbi.org.in/commonman/english/scripts/Notification.aspx?Id=2336) |
+| NPCI *Dispute Redressal Mechanism* (UPI, 1 page) | [NPCI website](https://www.npci.org.in), UPI section |
 
-The PDFs are not stored in this repo. Download them from the official pages above.
+The PDFs are not stored in this repo. Download them from the official sites above.
 
 ## Tech stack
 
@@ -71,35 +78,45 @@ The PDFs are not stored in this repo. Download them from the official pages abov
 
 ## How to run it
 
-1. Install n8n (`npx n8n`) or use n8n Cloud.
+1. Install n8n (`npx n8n`) or use n8n Cloud. This project was built on an n8n Cloud trial and exported, so it also runs on a free self-hosted n8n.
 2. Import both files from the `workflows/` folder (menu, then **Import from file**).
 3. Add your own credentials: Google Drive, Google Sheets, Gemini API key and Pinecone API key. Credentials are not included in the exported files.
-4. Create a Pinecone index. Its dimension must match your Gemini embedding model, and both workflows must use the same index.
-5. Put the two documents in a Google Drive folder, then point the Drive Trigger in workflow 1 at that folder.
-6. Run workflow 1 once to load the documents.
+4. Create a Pinecone index. Its dimension must match your Gemini embedding model, and both workflows must use the same index and namespace.
+5. Put the two documents in a Google Drive folder, then point the Drive Trigger in workflow 1 at that folder. Pick your own Google Sheet in the chat log node.
+6. Run workflow 1 once for each document. Do not run it twice for the same file, because that stores the text twice.
 7. Open workflow 2 and click **Open chat**.
 
 ## Test results
 
-I tested the bot with questions whose answers I know from the documents, plus questions it should refuse.
+I checked each answer against the source paragraph in the documents. The full question list and results are in [docs/test-results.md](docs/test-results.md).
 
 | Question | Source in document | Result |
 |---|---|---|
-| I see an unauthorised transaction. What should I do first? | RBI Para 5 | Correct |
-| I report within 3 working days. What is my liability? | RBI Table 2 | Correct |
-| And if it takes 6 days? (follow-up) | RBI Table 1 and 2 | Correct |
+| I see an unauthorised transaction. What should I do first? | RBI Para 5 | Partial |
+| I report within 3 working days. What is my liability? | RBI Para 6(ii), Table 2 | Correct |
+| And if it takes 6 days? (follow-up) | RBI Para 7(ii), Tables 1 and 2 | Correct |
 | How fast must the bank return my money? | RBI Para 9 and 10 | Correct |
-| Where do I first raise a UPI complaint? | NPCI mechanism | [add result] |
-| [add more rows] | | |
+| Where do I first raise a UPI complaint, and what if it isn't fixed? | NPCI mechanism | Correct |
+| Will I definitely get my money back? | RBI Para 6, 7(i), 12 | Correct (no promise made) |
+| What is the HDFC bank refund policy? | Not in documents | Correct ("not in my documents") |
+| How do I make pasta? | Off-topic | Correct (refused) |
 
-**Score:** [X] of [Y] questions correct on questions that are in the documents. [Z] of [W] behaved correctly on questions that should be refused or marked "not in my documents".
+**Tested so far:** 8 questions, 7 correct and 1 partial. The partial answer gave the right steps but cited the wrong paragraph number (Para 6 and 7 instead of Para 5).
+
+### Problems found and fixed
+
+- **The bot added facts that are not in the documents.** My first prompt told it to give the 1930 helpline and the cyber crime portal on its own. I rewrote the system prompt so it answers from the documents first and labels anything else as general guidance.
+- **The NPCI document was missing from the vector store.** A test question about where to complain was answered from the RBI circular only. I loaded the NPCI document into Pinecone and the answer then matched the NPCI source.
+- **Free-tier limits.** Gemini's free tier has a small daily request limit per model, so I spread the testing over several days.
 
 ## Limitations
 
-- It uses only two documents, so it cannot answer questions about scam types, prevention tips or UPI basics.
+- It uses two documents, so it cannot answer questions about scam types, prevention tips or UPI basics.
+- The NPCI document is one page, so complaint answers are short.
 - The RBI circular is from 2017. Rules may have changed, so users should confirm with their bank.
 - The circular applies to scheduled commercial banks, small finance banks and payments banks, not to every institution.
-- The Gemini free tier has daily request limits, so heavy testing can hit a rate-limit error.
+- Answers vary a little between runs, and a citation can point to the wrong paragraph number (seen once in testing).
+- The Gemini free tier has daily request limits, so heavy use can hit a rate-limit error.
 - Advice such as calling 1930 is not in the documents. The bot labels it as general guidance.
 - It gives information, not legal or financial advice. It cannot access bank accounts, trace payments or file complaints.
 
@@ -111,7 +128,19 @@ I tested the bot with questions whose answers I know from the documents, plus qu
 - A step-by-step "report my fraud" flow.
 - A feedback button, so users can mark wrong answers.
 
+## Repo contents
+
+```
+README.md
+workflows/   the two n8n workflow files
+docs/        system prompt and full test results
+screenshots/ workflow and chat screenshots
+```
+
 ## Disclaimer
 
 This is a student project. It is not affiliated with RBI, NPCI or any bank. Do not treat its answers as legal or financial advice.
 
+---
+
+Built by Akshita Pahade as an AI mini project.
