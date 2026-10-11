@@ -6,7 +6,7 @@ Built with **n8n**, **Google Gemini**, **Pinecone**, **Google Drive** and **Goog
 
 **Demo video:** 
 
-![Chatbot workflow](screenshots/workflow-chatbot.png)
+Chatbot workflow - screenshots/workflow-chatbot.png
 
 ---
 
