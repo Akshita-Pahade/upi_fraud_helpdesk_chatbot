@@ -1,0 +1,184 @@
+{
+  "name": "Push Data to Vector Database",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1ge-BUi_0SHA9Lw1oGhtQi7hJKq5vkUBv",
+          "mode": "list",
+          "cachedResultName": "UPI Fraud Chatbot",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1ge-BUi_0SHA9Lw1oGhtQi7hJKq5vkUBv"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -80
+      ],
+      "id": "4b55636d-5d12-4de0-8a89-4adc59ce9df2",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "baZixbcEhiJ7tbIz",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        32,
+        -80
+      ],
+      "id": "6e16f042-6d21-4a2f-b96e-064b93ddc2cf",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "baZixbcEhiJ7tbIz",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "upi-chatbot",
+          "mode": "list",
+          "cachedResultName": "upi-chatbot"
+        },
+        "options": {
+          "pineconeNamespace": "upi-chatbot"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        -80
+      ],
+      "id": "6205b52c-4b1f-480a-a46b-eb24ebc69ff1",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "vdYzsxbzranlo6cE",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        112
+      ],
+      "id": "e963fccd-9484-4e9d-8455-c76db2ef6fcf",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xS0HufL71noZvyFh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        128
+      ],
+      "id": "ee71785c-ea61-4292-b23c-8c86ea17eb2c",
+      "name": "Default Data Loader"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "352cb373-d959-4b7e-9bd9-fd5336959426",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "37c47d052005a5ea90db839bf36affd14fd76ce42ccbfe3a67080784dcf9cfb7"
+  },
+  "nodeGroups": [],
+  "id": "h7UzfSdVqi2IvelH",
+  "tags": []
+}
