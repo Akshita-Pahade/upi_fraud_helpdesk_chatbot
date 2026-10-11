@@ -55,10 +55,6 @@ When chat message received -> AI Agent -> Append row in Google Sheet -> Edit Fie
                                      |- Embeddings Google Gemini
 ```
 
-The AI Agent searches Pinecone first, then answers from what it finds. The system prompt is in [docs/system-prompt.txt](docs/system-prompt.txt).
-
-## Documents used
-
 | Document | Source |
 |---|---|
 | RBI circular RBI/2017-18/15, 6 July 2017: *Customer Protection - Limiting Liability of Customers in Unauthorised Electronic Banking Transactions* | [RBI website](https://www.rbi.org.in/commonman/english/scripts/Notification.aspx?Id=2336) |
