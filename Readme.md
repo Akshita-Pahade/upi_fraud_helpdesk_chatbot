@@ -64,7 +64,6 @@ The AI Agent searches Pinecone first, then answers from what it finds. The syste
 | RBI circular RBI/2017-18/15, 6 July 2017: *Customer Protection - Limiting Liability of Customers in Unauthorised Electronic Banking Transactions* | [RBI website](https://www.rbi.org.in/commonman/english/scripts/Notification.aspx?Id=2336) |
 | NPCI *Dispute Redressal Mechanism* (UPI, 1 page) | [NPCI website](https://www.npci.org.in), UPI section |
 
-The PDFs are not stored in this repo. Download them from the official sites above.
 
 ## Tech stack
 
@@ -85,23 +84,6 @@ The PDFs are not stored in this repo. Download them from the official sites abov
 5. Put the two documents in a Google Drive folder, then point the Drive Trigger in workflow 1 at that folder. Pick your own Google Sheet in the chat log node.
 6. Run workflow 1 once for each document. Do not run it twice for the same file, because that stores the text twice.
 7. Open workflow 2 and click **Open chat**.
-
-## Test results
-
-I checked each answer against the source paragraph in the documents. The full question list and results are in [docs/test-results.md](docs/test-results.md).
-
-| Question | Source in document | Result |
-|---|---|---|
-| I see an unauthorised transaction. What should I do first? | RBI Para 5 | Partial |
-| I report within 3 working days. What is my liability? | RBI Para 6(ii), Table 2 | Correct |
-| And if it takes 6 days? (follow-up) | RBI Para 7(ii), Tables 1 and 2 | Correct |
-| How fast must the bank return my money? | RBI Para 9 and 10 | Correct |
-| Where do I first raise a UPI complaint, and what if it isn't fixed? | NPCI mechanism | Correct |
-| Will I definitely get my money back? | RBI Para 6, 7(i), 12 | Correct (no promise made) |
-| What is the HDFC bank refund policy? | Not in documents | Correct ("not in my documents") |
-| How do I make pasta? | Off-topic | Correct (refused) |
-
-**Tested so far:** 8 questions, 7 correct and 1 partial. The partial answer gave the right steps but cited the wrong paragraph number (Para 6 and 7 instead of Para 5).
 
 ### Problems found and fixed
 
@@ -141,6 +123,4 @@ screenshots/ workflow and chat screenshots
 
 This is a student project. It is not affiliated with RBI, NPCI or any bank. Do not treat its answers as legal or financial advice.
 
----
 
-Built by Akshita Pahade as an AI mini project.
