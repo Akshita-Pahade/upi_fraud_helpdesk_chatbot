@@ -106,15 +106,6 @@ When chat message received -> AI Agent -> Append row in Google Sheet -> Edit Fie
 - A step-by-step "report my fraud" flow.
 - A feedback button, so users can mark wrong answers.
 
-## Repo contents
-
-```
-README.md
-workflows/   the two n8n workflow files
-docs/        system prompt and full test results
-screenshots/ workflow and chat screenshots
-```
-
 ## Disclaimer
 
 This is a student project. It is not affiliated with RBI, NPCI or any bank. Do not treat its answers as legal or financial advice.
