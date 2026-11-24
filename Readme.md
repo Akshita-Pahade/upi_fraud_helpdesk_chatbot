@@ -4,7 +4,6 @@ A RAG chatbot that answers UPI fraud, refund and complaint questions from offici
 
 Built with **n8n**, **Google Gemini**, **Pinecone**, **Google Drive** and **Google Sheets**. It is a no-code project: the whole agent is two n8n workflows.
 
-**Demo video:** 
 
 ![Chatbot workflow](screenshots/workflow-chatbot.png)
 
